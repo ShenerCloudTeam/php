@@ -60,40 +60,8 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2"
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
 ENV PHP_LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie"
 
-ENV GPG_KEYS 42670A7FE4D0441C8E4632349E4FDC074A4EF02D 5A52880781F755608BF815FC910DEB46F53EA312
-
 ENV PHP_VERSION 7.4.0beta4
 ENV PHP_URL="https://downloads.php.net/~derick/php-7.4.0beta4.tar.xz" PHP_ASC_URL="https://downloads.php.net/~derick/php-7.4.0beta4.tar.xz.asc"
-ENV PHP_SHA256="e715c5e64f3e64e3d8f65a9c425c6affdd2ddd5228b3b67a4faad167ca9dfe57" PHP_MD5=""
-
-RUN set -eux; \
-	\
-	apk add --no-cache --virtual .fetch-deps gnupg; \
-	\
-	mkdir -p /usr/src; \
-	cd /usr/src; \
-	\
-	curl -fsSL -o php.tar.xz "$PHP_URL"; \
-	\
-	if [ -n "$PHP_SHA256" ]; then \
-		echo "$PHP_SHA256 *php.tar.xz" | sha256sum -c -; \
-	fi; \
-	if [ -n "$PHP_MD5" ]; then \
-		echo "$PHP_MD5 *php.tar.xz" | md5sum -c -; \
-	fi; \
-	\
-	if [ -n "$PHP_ASC_URL" ]; then \
-		curl -fsSL -o php.tar.xz.asc "$PHP_ASC_URL"; \
-		export GNUPGHOME="$(mktemp -d)"; \
-		for key in $GPG_KEYS; do \
-			gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
-		done; \
-		gpg --batch --verify php.tar.xz.asc php.tar.xz; \
-		gpgconf --kill all; \
-		rm -rf "$GNUPGHOME"; \
-	fi; \
-	\
-	apk del --no-network .fetch-deps
 
 COPY docker-php-source /usr/local/bin/
 
